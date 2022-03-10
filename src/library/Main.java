@@ -9,6 +9,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import library.databaseConnections.MySqlConnection;
 import library.item.ItemController;
+import library.item.Views.ItemForm;
 
 public class Main extends Application {
 
@@ -30,6 +31,7 @@ public class Main extends Application {
     stage.setScene(scene);
     stage.setTitle("Library Book Entry");
     stage.show();
+    ItemForm.setStatus(vbox, ItemForm.ADD_BOOK);
   }
 
   @Override

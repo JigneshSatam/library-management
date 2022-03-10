@@ -10,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -18,6 +19,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -28,6 +30,9 @@ import library.item.Item;
 import library.item.ItemController;
 
 public class ItemForm {
+
+  public static final String ADD_BOOK = "Add Book";
+  public static final String UPDATE_BOOK = "Update Book";
 
   private VBox vbox;
   private ObservableList<String> publisherList;
@@ -45,11 +50,31 @@ public class ItemForm {
     this.itemController = itemController;
   }
 
+  public static void setStatus(VBox vbox, String status) {
+    if (vbox.getParent() != null) {
+      Label titleLabel = new Label();
+      titleLabel.setText(status);
+
+      HBox statusbar = new HBox();
+      statusbar.getChildren().add(titleLabel);
+      statusbar.setAlignment(Pos.CENTER);
+
+      BorderPane root = (BorderPane) vbox.getParent();
+      root.setBottom(statusbar);
+    }
+  }
+
   public void createItemForm() {
     GridPane gridPane = createFormPane();
     addComponents(gridPane);
     vbox.getChildren().add(gridPane);
-    // setStatus(gridPane.getScene(), "Value");
+    String mode = ADD_BOOK;
+    if (
+      selectedItem != null && selectedItem.getItem_Description_ID() > 0
+    ) {
+      mode = UPDATE_BOOK;
+    }
+    setStatus(vbox, mode);
   }
 
   private GridPane createFormPane() {
@@ -429,13 +454,4 @@ public class ItemForm {
     }
   }
 
-  // private void setStatus(Scene scene, String status) {
-  //   // scene.getRoot();
-  //   BorderPane root = (BorderPane) scene.lookup("rootPane");
-  //   HBox statusbar = new HBox();
-  //   Label titleLabel = new Label("Title");
-  //   titleLabel.setText(status);
-  //   statusbar.getChildren().add(titleLabel);
-  //   root.setBottom(statusbar);
-  // }
 }
