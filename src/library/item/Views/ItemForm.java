@@ -353,7 +353,10 @@ public class ItemForm {
       @Override
       public void handle(ActionEvent event) {
         try {
-          if (selectedItem != null) {
+          if (
+            selectedItem != null &&
+            selectedItem.getItem_Description_ID() > 0
+          ) {
             itemController.deleteItem(selectedItem);
             itemController.list(false, null, false);
           }
