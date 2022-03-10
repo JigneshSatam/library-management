@@ -65,9 +65,7 @@ public class ItemModel {
     try {
       CallableStatement statment = connection.prepareCall(query);
       setCommonColumns(statment, item);
-      ResultSet rs = statment.executeQuery();
-      // System.out.println("isBeforeFirst: " + rs.isBeforeFirst());
-      // System.out.println("rowInserted: " + rs.rowInserted());
+      statment.executeQuery();
     } catch (SQLException e) {
       throw e;
     }
