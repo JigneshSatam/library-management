@@ -5,6 +5,7 @@ public class Item {
   private String Item_Type;
   private final int Item_Type_MaxLenght = 100;
   private int Number_Of_Copies;
+  private final int Number_Of_Copies_MaxLenght = 10000;
   private boolean Is_Rentable;
   private String ISBN;
   private final int ISBN_MinLenght = 10;
@@ -51,7 +52,10 @@ public class Item {
     return this.Number_Of_Copies;
   }
 
-  public void setNumber_Of_Copies(int Number_Of_Copies) {
+  public void setNumber_Of_Copies(int Number_Of_Copies) throws Exception {
+    if (Number_Of_Copies > Number_Of_Copies_MaxLenght) {
+      throw new Exception("Number Of Copies exceeded max limit of " + Number_Of_Copies_MaxLenght);
+    }
     this.Number_Of_Copies = Number_Of_Copies;
   }
 
