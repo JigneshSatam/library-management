@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -65,8 +66,13 @@ public class ItemTable {
       Item selectedItem = itemTable.getSelectionModel().getSelectedItem();
       if (selectedItem != null) {
         try {
-          itemController.list(false, selectedItem);
+          itemController.list(false, selectedItem, false);
         } catch (SQLException e1) {
+          Alert alert = new Alert(Alert.AlertType.ERROR);
+          alert.setTitle("Someting went wrong");
+          alert.setHeaderText(null);
+          alert.setContentText(e1.getMessage());
+          alert.showAndWait();
           e1.printStackTrace();
         }
       }

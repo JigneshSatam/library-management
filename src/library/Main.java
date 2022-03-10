@@ -20,7 +20,7 @@ public class Main extends Application {
     connection = MySqlConnection.getConnection();
     VBox vbox = new VBox();
     itemCtrl = new ItemController(connection, vbox);
-    itemCtrl.list(false, null);
+    itemCtrl.list(false, null, false);
 
     BorderPane root = new BorderPane();
     root.setId("rootPane");

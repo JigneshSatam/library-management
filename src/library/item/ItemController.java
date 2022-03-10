@@ -19,7 +19,7 @@ public class ItemController {
     this.vbox = vbox;
   }
 
-  public void list(Boolean clearList, Item item) throws SQLException {
+  public void list(Boolean clearList, Item item, Boolean search) throws SQLException {
     vbox.getChildren().clear();
     ObservableList<String> publishers = new PublisherModel(connection).getPublisherList();
 
@@ -28,7 +28,11 @@ public class ItemController {
 
     ObservableList<Item> items = FXCollections.observableArrayList();
     if (!clearList) {
-      items = itemModel.getItemList();
+      if (search) {
+        items = itemModel.searchitems(item);
+      } else {
+        items = itemModel.getItemList();
+      }
     }
 
     new ItemForm(vbox, publishers, types, item, this).createItemForm();

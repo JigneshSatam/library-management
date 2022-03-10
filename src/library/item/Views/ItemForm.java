@@ -246,7 +246,7 @@ public class ItemForm {
                 Alert.AlertType.CONFIRMATION,
                 "Item Update", "Item " + titleField.getText().trim() + " updated successfully.");
           }
-          itemController.list(false, null);
+          itemController.list(false, null, false);
         } catch (Exception e) {
           showAlert(
               Alert.AlertType.ERROR,
@@ -266,7 +266,7 @@ public class ItemForm {
       @Override
       public void handle(ActionEvent event) {
         try {
-          itemController.list(true, null);
+          itemController.list(true, null, false);
         } catch (SQLException e) {
           showAlert(
               Alert.AlertType.ERROR,
@@ -282,6 +282,19 @@ public class ItemForm {
     Button searchButton = new Button("Search");
     searchButton.setPrefHeight(30);
     searchButton.setPrefWidth(80);
+    searchButton.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        try {
+          itemController.list(false, selectedItem, true);
+        } catch (SQLException e) {
+          showAlert(
+              Alert.AlertType.ERROR,
+              "Someting went wrong", e.getMessage());
+          e.printStackTrace();
+        }
+      }
+    });
     return searchButton;
   }
 
@@ -295,7 +308,7 @@ public class ItemForm {
         try {
           if (selectedItem != null) {
             itemController.deleteItem(selectedItem);
-            itemController.list(false, null);
+            itemController.list(false, null, false);
           }
         } catch (SQLException e) {
           showAlert(

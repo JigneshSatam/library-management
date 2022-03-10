@@ -18,8 +18,8 @@ public class ItemModel {
 
   public ObservableList<String> getItemTypeLits() throws SQLException {
     try (
-      PreparedStatement stmnt = connection.prepareStatement("select Type from Library.Item_Type ORDER BY TYPE;");
-      ResultSet rs = stmnt.executeQuery();
+      PreparedStatement statment = connection.prepareStatement("select Type from Library.Item_Type ORDER BY TYPE;");
+      ResultSet rs = statment.executeQuery();
     ) {
       ObservableList<String> typeList = FXCollections.observableArrayList();
 
@@ -98,6 +98,33 @@ public class ItemModel {
     }
   }
 
+  public ObservableList<Item> searchitems(Item itemToSearch) throws SQLException {
+    String query = getSerachQuery(itemToSearch);
+    PreparedStatement statment = connection.prepareStatement(query);
+    ResultSet rs = statment.executeQuery();
+    ObservableList<Item> itemList = FXCollections.observableArrayList();
+    while (rs.next()) {
+      Item item;
+      try {
+        item = new Item(rs.getString("ISBN"));
+        item.setItem_ID(rs.getInt("Item_ID"));
+        item.setItem_Description_ID(rs.getInt("Item_Description_ID"));
+        item.setPublisher_ID(rs.getInt("Publisher_ID"));
+        item.setTitle(rs.getString("Title"));
+        item.setDeweyNumberField(rs.getString("Dewey_Decimal_System_Number"));
+        item.setItem_Type(rs.getString("Item_Type"));
+        item.setPublisher(rs.getString("Publisher"));
+        item.setNumber_Of_Copies(rs.getInt("Number_Of_Copies"));
+        item.setPublication_Date(rs.getString("Publication_Date"));
+        item.setAuthors(rs.getString("Authors"));
+        itemList.add(item);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+    return itemList;
+  }
+
   private void setCommonColumns(CallableStatement statment, Item item) throws SQLException {
     statment.setString("Title_IN", item.getTitle());
     statment.setString("Publication_Date_IN", item.getPublication_Date());
@@ -107,5 +134,31 @@ public class ItemModel {
     statment.setString("Item_Type_IN", item.getItem_Type());
     statment.setInt("Number_Of_Copies_IN", item.getNumber_Of_Copies());
     statment.setString("ISBN_IN", item.getISBN());
+  }
+
+  public String getSerachQuery(Item item) {
+    return """
+      select
+        Item_Description.Item_Description_ID,
+        Item.ISBN, Item_Description.Title,
+        Item_Description.Dewey_Decimal_System_Number,
+        Item.Item_Type, Publisher.Name as Publisher,
+        Item.Number_Of_Copies, Item_Description.Publication_Date,
+        Item.Item_ID, Publisher.Publisher_ID,
+        group_concat(Author.Name separator ', ') as Authors
+      from Item_Description
+      inner join Authorship using(Item_Description_ID)
+        inner join Publisher using(Publisher_ID)
+      inner join Author using(Author_ID)
+      inner join Item using(Item_Description_ID)
+      group by
+        Item_Description.Item_Description_ID, Item.ISBN,
+        Item_Description.Title,
+        Item_Description.Dewey_Decimal_System_Number,
+        Item.Item_Type,
+        Publisher.Name, Item.Number_Of_Copies,
+        Item_Description.Publication_Date,
+        Item.Item_ID, Publisher.Publisher_ID;
+    """;
   }
 }

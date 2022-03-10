@@ -14,6 +14,7 @@ public class Item {
   private final int Link_MaxLenght = 1000;
   private int Item_Description_ID;
   private String Title;
+  private final int Title_MaxLenght = 255;
   private String Authors;
   private String DeweyNumberField;
   private String Publisher;
@@ -97,7 +98,10 @@ public class Item {
     return this.Title;
   }
 
-  public void setTitle(String Title) {
+  public void setTitle(String Title) throws Exception {
+    if (Title.length() > Title_MaxLenght) {
+      throw new Exception("Title exceeded max limit of " + Title_MaxLenght);
+    }
     this.Title = Title;
   }
 
