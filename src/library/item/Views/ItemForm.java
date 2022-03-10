@@ -148,20 +148,13 @@ public class ItemForm {
     });
     gridPane.add(publicationDateField, 1, 7);
 
-    if (selectedItem != null) {
-      titleField.setText(selectedItem.getTitle());
-      authorsField.setText(selectedItem.getAuthors());
-      isbnField.setText(selectedItem.getISBN());
-      deweyNumberField.setText(selectedItem.getDeweyNumberField());
-      publisherComboBox.getSelectionModel().select(selectedItem.getPublisher());
-      numberOfCopiesField.setText(String.valueOf(selectedItem.getNumber_Of_Copies()));
-      typeComboBox.getSelectionModel().select(selectedItem.getItem_Type());
-      publicationDateField.setValue(stringToDate(selectedItem.getPublication_Date()));
-    }
+
+    setFieldValues(titleField, authorsField, isbnField, publisherComboBox,
+    numberOfCopiesField, publicationDateField, deweyNumberField, typeComboBox);
 
     Button saveButton = getSaveButton(titleField, authorsField, isbnField, publisherComboBox, numberOfCopiesField, publicationDateField, deweyNumberField, typeComboBox);
 
-    Button searchButton = getSearchButton();
+    Button searchButton = getSearchButton(titleField, authorsField, isbnField, publisherComboBox, numberOfCopiesField, publicationDateField, deweyNumberField, typeComboBox);
 
     HBox buttonBox = new HBox();
     buttonBox.setSpacing(20);
@@ -278,7 +271,12 @@ public class ItemForm {
     return clearButton;
   }
 
-  public Button getSearchButton() {
+  public Button getSearchButton(
+    TextField titleField, TextField authorsField,
+    TextField isbnField, ComboBox<String> publisherComboBox,
+    TextField numberOfCopiesField, DatePicker publicationDateField,
+    TextField deweyNumberField, ComboBox<String> typeComboBox
+  ) {
     Button searchButton = new Button("Search");
     searchButton.setPrefHeight(30);
     searchButton.setPrefWidth(80);
@@ -286,11 +284,60 @@ public class ItemForm {
       @Override
       public void handle(ActionEvent event) {
         try {
-          itemController.list(false, selectedItem, true);
-        } catch (SQLException e) {
+          Boolean allFieldsEmpty = true;
+          Item item = new Item();
+
+          if (!titleField.getText().isEmpty()) {
+            item.setTitle(titleField.getText());
+            allFieldsEmpty = false;
+          }
+
+          if (!authorsField.getText().isEmpty()) {
+            item.setAuthors(authorsField.getText());
+            allFieldsEmpty = false;
+          }
+
+          if (!deweyNumberField.getText().isEmpty()) {
+            item.setDeweyNumberField(deweyNumberField.getText());
+            allFieldsEmpty = false;
+          }
+
+          if (!isbnField.getText().isEmpty()) {
+            item.setISBN(isbnField.getText());
+            allFieldsEmpty = false;
+          }
+
+          if (!publisherComboBox.getSelectionModel().isEmpty()) {
+            item.setPublisher(publisherComboBox.getSelectionModel().selectedItemProperty().getValue());
+          }
+
+          if (!numberOfCopiesField.getText().isEmpty()) {
+            item.setNumber_Of_Copies(Integer.parseInt(numberOfCopiesField.getText()));
+            allFieldsEmpty = false;
+          }
+
+          if (!typeComboBox.getSelectionModel().isEmpty()) {
+            item.setItem_Type(typeComboBox.getSelectionModel().selectedItemProperty().getValue());
+            allFieldsEmpty = false;
+          }
+
+          if (publicationDateField.getValue() != null) {
+            item.setPublication_Date(publicationDateField.getValue().toString());
+            allFieldsEmpty = false;
+          }
+
+          if (allFieldsEmpty) {
+            showAlert(
+              Alert.AlertType.ERROR,
+              "Item not searched", "Nothing to search"
+            );
+            return;
+          }
+          itemController.list(false, item, true);
+        } catch (Exception e) {
           showAlert(
               Alert.AlertType.ERROR,
-              "Someting went wrong", e.getMessage());
+              "Item not searched", e.getMessage());
           e.printStackTrace();
         }
       }
@@ -329,7 +376,30 @@ public class ItemForm {
     alert.showAndWait();
   }
 
-  public static void applyIntegerFormatToField(TextField field) {
+  public void setFieldValues(
+    TextField titleField, TextField authorsField,
+    TextField isbnField, ComboBox<String> publisherComboBox,
+    TextField numberOfCopiesField, DatePicker publicationDateField,
+    TextField deweyNumberField, ComboBox<String> typeComboBox
+  ) {
+    if (selectedItem != null) {
+      if (selectedItem.getTitle() != null) {titleField.setText(selectedItem.getTitle());}
+      if (selectedItem.getAuthors() != null) {authorsField.setText(selectedItem.getAuthors());}
+      if (selectedItem.getISBN() != null) {isbnField.setText(selectedItem.getISBN());}
+      if (selectedItem.getDeweyNumberField() != null)
+        {deweyNumberField.setText(selectedItem.getDeweyNumberField());}
+      if (selectedItem.getPublisher() != null)
+        {publisherComboBox.getSelectionModel().select(selectedItem.getPublisher());}
+      if (selectedItem.getNumber_Of_Copies() > 0)
+        {numberOfCopiesField.setText(String.valueOf(selectedItem.getNumber_Of_Copies()));}
+      if (selectedItem.getItem_Type() != null)
+        {typeComboBox.getSelectionModel().select(selectedItem.getItem_Type());}
+      if (selectedItem.getPublication_Date() != null)
+        {publicationDateField.setValue(stringToDate(selectedItem.getPublication_Date()));}
+    }
+  }
+
+  public void applyIntegerFormatToField(TextField field) {
     final Pattern NumberRegx = Pattern.compile("[-]?[\\d]*");
     field.setTextFormatter(new TextFormatter<>(f -> {
       if (f.getControlNewText().isEmpty()) {

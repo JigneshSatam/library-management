@@ -22,10 +22,10 @@ public class Item {
   private int Publisher_ID;
 
   public Item(String ISBN) throws Exception {
-    if (ISBN.length() != ISBN_MinLenght && ISBN.length() != ISBN_MaxLenght) {
-      throw new Exception("Incorrect ISBN");
-    }
-    this.ISBN = ISBN;
+    setISBN(ISBN);
+  }
+
+  public Item() {
   }
 
   public int getItem_ID() {
@@ -65,6 +65,13 @@ public class Item {
 
   public String getISBN() {
     return this.ISBN;
+  }
+
+  public void setISBN(String isbn) throws Exception {
+    if (isbn.length() != ISBN_MinLenght && isbn.length() != ISBN_MaxLenght) {
+      throw new Exception("Incorrect ISBN");
+    }
+    this.ISBN = isbn;
   }
 
   public int getNumber_Of_Pages() {

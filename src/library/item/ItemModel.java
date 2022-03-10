@@ -66,7 +66,7 @@ public class ItemModel {
       CallableStatement statment = connection.prepareCall(query);
       setCommonColumns(statment, item);
       ResultSet rs = statment.executeQuery();
-      System.out.println("isBeforeFirst: " + rs.isBeforeFirst());
+      // System.out.println("isBeforeFirst: " + rs.isBeforeFirst());
       // System.out.println("rowInserted: " + rs.rowInserted());
     } catch (SQLException e) {
       throw e;
@@ -101,6 +101,40 @@ public class ItemModel {
   public ObservableList<Item> searchitems(Item itemToSearch) throws SQLException {
     String query = getSerachQuery(itemToSearch);
     PreparedStatement statment = connection.prepareStatement(query);
+    int counter = 1;
+
+    if (itemToSearch.getTitle() != null &&
+      itemToSearch.getTitle().trim() != "") {
+      statment.setString(counter++, "%" + itemToSearch.getTitle() + "%");
+    }
+    if (itemToSearch.getAuthors() != null &&
+        itemToSearch.getAuthors().trim() != "") {
+      for (String author : itemToSearch.getAuthors().split(",")) {
+        if (author.trim() != "") {
+          statment.setString(counter++, "%" + author.trim() + "%");
+        }
+      }
+    }
+    if (itemToSearch.getDeweyNumberField() != null &&
+        itemToSearch.getDeweyNumberField().trim() != "") {
+      statment.setString(counter++, itemToSearch.getDeweyNumberField());
+    }
+    if (itemToSearch.getISBN() != null &&
+        itemToSearch.getISBN().trim() != "") {
+      statment.setString(counter++, itemToSearch.getISBN());
+    }
+    if (itemToSearch.getNumber_Of_Copies() > 0) {
+      statment.setInt(counter++, itemToSearch.getNumber_Of_Copies());
+    }
+    if (itemToSearch.getItem_Type() != null &&
+        itemToSearch.getItem_Type().trim() != "") {
+      statment.setString(counter++, itemToSearch.getItem_Type());
+    }
+    if (itemToSearch.getPublication_Date() != null &&
+        itemToSearch.getPublication_Date().trim() != "") {
+      statment.setString(counter++, itemToSearch.getPublication_Date());
+    }
+
     ResultSet rs = statment.executeQuery();
     ObservableList<Item> itemList = FXCollections.observableArrayList();
     while (rs.next()) {
@@ -137,7 +171,7 @@ public class ItemModel {
   }
 
   public String getSerachQuery(Item item) {
-    return """
+    String query =  """
       select
         Item_Description.Item_Description_ID,
         Item.ISBN, Item_Description.Title,
@@ -147,10 +181,75 @@ public class ItemModel {
         Item.Item_ID, Publisher.Publisher_ID,
         group_concat(Author.Name separator ', ') as Authors
       from Item_Description
-      inner join Authorship using(Item_Description_ID)
-        inner join Publisher using(Publisher_ID)
-      inner join Author using(Author_ID)
+      inner join Publisher using(Publisher_ID)
       inner join Item using(Item_Description_ID)
+      left join Authorship using(Item_Description_ID)
+      left join Author using(Author_ID)
+      where
+        Item.Item_ID in (
+          select Item.Item_ID
+          from Item_Description
+          inner join Publisher using(Publisher_ID)
+          inner join Item using(Item_Description_ID)
+          left join Authorship using(Item_Description_ID)
+          left join Author using(Author_ID)
+          where
+    """;
+      if (
+        item.getTitle() != null &&
+        item.getTitle().trim() != ""
+      ) {
+        query += "\n Item_Description.Title like ? \n and ";
+      }
+      if (
+        item.getAuthors() != null &&
+        item.getAuthors().trim() != ""
+      ) {
+        Boolean start = true;
+        for (String author: item.getAuthors().split(",")) {
+          if (author.trim() != "") {
+            if (start) {
+              query += " ( ";
+              start = false;
+            }
+            query += "\n Author.Name like ? \n or ";
+          }
+        }
+        if (!start) {
+          query = query.substring(0, query.lastIndexOf(" or "));
+          query += " ) \n and ";
+        }
+      }
+      if (
+        item.getDeweyNumberField() != null &&
+        item.getDeweyNumberField().trim() != ""
+      ) {
+        query += "\n Item_Description.Dewey_Decimal_System_Number = ? \n and ";
+      }
+      if (
+        item.getISBN() != null &&
+        item.getISBN().trim() != ""
+      ) {
+        query += "\n Item.ISBN = ? \n and ";
+      }
+      if (item.getNumber_Of_Copies() > 0) {
+        query += "\n Item.Number_Of_Copies = ? \n and ";
+      }
+      if (
+        item.getItem_Type() != null &&
+        item.getItem_Type().trim() != ""
+      ) {
+        query += "\n Item.Item_Type = ? \n and ";
+      }
+      if (
+        item.getPublication_Date() != null &&
+        item.getPublication_Date().trim() != ""
+      ) {
+        query += "\n Item_Description.Publication_Date = ? \n and ";
+      }
+      query = query.substring(0, query.lastIndexOf(" and "));
+      query += """
+      )
       group by
         Item_Description.Item_Description_ID, Item.ISBN,
         Item_Description.Title,
@@ -160,5 +259,6 @@ public class ItemModel {
         Item_Description.Publication_Date,
         Item.Item_ID, Publisher.Publisher_ID;
     """;
+    return query;
   }
 }
