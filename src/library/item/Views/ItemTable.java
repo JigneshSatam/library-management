@@ -24,6 +24,9 @@ public class ItemTable {
     this.itemController = itemController;
   }
 
+  /**
+   * creates the table view for the list of items provided and attachs the table to the {@code vbox}
+   */
   public void createItemTable() {
     TableView<Item> itemTable = new TableView<>();
 

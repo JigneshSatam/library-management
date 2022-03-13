@@ -15,6 +15,12 @@ public class PublisherModel {
     this.connection = connection;
   }
 
+
+  /**
+   * Returns the list of {@code publishers} in the library
+   * @return ObservableList<String>
+   * @throws SQLException
+   */
   public ObservableList<String> getPublisherList() throws SQLException {
     try (
       PreparedStatement stmnt = connection.prepareStatement("select Name from Library.Publisher;");

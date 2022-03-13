@@ -16,6 +16,13 @@ public class ItemModel {
     this.connection = connection;
   }
 
+
+  /**
+   * Returns the list of allowed item types
+   *
+   * @return ObservableList<String> is a list of Names of the item type
+   * @throws SQLException if any exception occured while fetching the list
+   */
   public ObservableList<String> getItemTypeLits() throws SQLException {
     try (
       PreparedStatement statment = connection.prepareStatement("select Type from Library.Item_Type ORDER BY TYPE;");
@@ -34,6 +41,13 @@ public class ItemModel {
     }
   }
 
+
+  /**
+   * Returns the list of items
+   *
+   * @return ObservableList<Item> is a list of {@code items}
+   * @throws SQLException if any exception occured while fetching the list
+   */
   public ObservableList<Item> getItemList() throws SQLException {
     CallableStatement stmnt = connection.prepareCall("call Library.getItems();");
     ResultSet rs = stmnt.executeQuery();
@@ -60,6 +74,15 @@ public class ItemModel {
     return itemList;
   }
 
+
+  /**
+   * Creates an item in the {@code library} with the properties provided in the
+   * item parameter}
+   *
+   * @param item contains the properties like {@code Title, Publisher...}
+   * @throws SQLException if any exception occured while
+   *                      creating the item
+   */
   public void createItem(Item item) throws SQLException {
     String query = "CALL Library.insertItem(?, ?, ?, ?, ?, ?, ?, ?);";
     try {
@@ -71,6 +94,14 @@ public class ItemModel {
     }
   }
 
+
+  /**
+   * Updates an item in the {@code library} with the properties provided in the
+   * item parameter
+   *
+   * @param item contains the properties to be updated as well as old properties
+   * @throws SQLException if any exception occured while updating the item
+   */
   public void updateItem(Item item) throws SQLException {
     String query = "CALL Library.updateItem(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
     try {
@@ -84,6 +115,13 @@ public class ItemModel {
     }
   }
 
+
+  /**
+   * Deletes an item from the {@code library}
+   *
+   * @param item to be deleted
+   * @throws SQLException if any exception occured while deleting the item
+   */
   public void deleteItem(Item item) throws SQLException {
     String query = "CALL Library.deleteItem(?, ?);";
     try {
@@ -96,6 +134,15 @@ public class ItemModel {
     }
   }
 
+
+  /**
+   * Searches item(s) with the properties provied in the {@code itemToSearch}
+   * parameter
+   *
+   * @param itemToSearch contains the properties to be searched
+   * @return ObservableList<Item> is a list of {@code item(s)} which matches the search criteria
+   * @throws SQLException if any exception occured while searching the item(s)
+   */
   public ObservableList<Item> searchitems(Item itemToSearch) throws SQLException {
     String query = getSerachQuery(itemToSearch);
     PreparedStatement statment = connection.prepareStatement(query);
@@ -157,6 +204,14 @@ public class ItemModel {
     return itemList;
   }
 
+
+  /**
+   * sets values of the item columns
+   *
+   * @param statment is the query
+   * @param item contains the properties of the item
+   * @throws SQLException
+   */
   private void setCommonColumns(CallableStatement statment, Item item) throws SQLException {
     statment.setString("Title_IN", item.getTitle());
     statment.setString("Publication_Date_IN", item.getPublication_Date());
@@ -168,7 +223,13 @@ public class ItemModel {
     statment.setString("ISBN_IN", item.getISBN());
   }
 
-  public String getSerachQuery(Item item) {
+
+  /**
+   * Generates and returns the query for searching the item(s) using the {@code not null} properties provided in the {@code item} parameter
+   * @param item contains properties of the item(s) to be searched
+   * @return String - Returns query string
+   */
+  private String getSerachQuery(Item item) {
     String query =  """
       select
         Item_Description.Item_Description_ID,

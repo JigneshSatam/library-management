@@ -50,6 +50,12 @@ public class ItemForm {
     this.itemController = itemController;
   }
 
+
+  /**
+   * Sets the status of screen on the status bar
+   * @param vbox is the child of the root node
+   * @param status is the status to be displayed
+   */
   public static void setStatus(VBox vbox, String status) {
     if (vbox.getParent() != null) {
       Label titleLabel = new Label();
@@ -64,6 +70,10 @@ public class ItemForm {
     }
   }
 
+
+  /**
+   * Creates an item form which is used to pass the properites of the item to be created, updated, deleted, and searched.
+   */
   public void createItemForm() {
     GridPane gridPane = createFormPane();
     addComponents(gridPane);
@@ -77,6 +87,12 @@ public class ItemForm {
     setStatus(vbox, mode);
   }
 
+
+  /**
+   * Creates grid pane for the item form
+   *
+   * @return GridPane
+   */
   private GridPane createFormPane() {
 
     GridPane gridPane = new GridPane();
@@ -98,6 +114,11 @@ public class ItemForm {
     return gridPane;
   }
 
+
+  /**
+   * Adds the UI fields to the grid pane
+   * @param gridPane
+   */
   private void addComponents(GridPane gridPane) {
 
     Label titleLabel = new Label("Title");
@@ -188,6 +209,20 @@ public class ItemForm {
     gridPane.add(buttonBox, 1, 8);
   }
 
+
+  /**
+   * Returns the save button
+   *
+   * @param titleField
+   * @param authorsField
+   * @param isbnField
+   * @param publisherComboBox
+   * @param numberOfCopiesField
+   * @param publicationDateField
+   * @param deweyNumberField
+   * @param typeComboBox
+   * @return Button
+   */
   public Button getSaveButton(
     TextField titleField, TextField authorsField,
     TextField isbnField, ComboBox<String> publisherComboBox,
@@ -276,6 +311,12 @@ public class ItemForm {
     return saveButton;
   }
 
+
+  /**
+   * Returns the clear button
+   *
+   * @return Button
+   */
   public Button getClearButton() {
     Button clearButton = new Button("Clear");
     clearButton.setPrefHeight(30);
@@ -296,6 +337,21 @@ public class ItemForm {
     return clearButton;
   }
 
+
+  /**
+   *
+   * Returns the search button
+   *
+   * @param titleField
+   * @param authorsField
+   * @param isbnField
+   * @param publisherComboBox
+   * @param numberOfCopiesField
+   * @param publicationDateField
+   * @param deweyNumberField
+   * @param typeComboBox
+   * @return Button
+   */
   public Button getSearchButton(
     TextField titleField, TextField authorsField,
     TextField isbnField, ComboBox<String> publisherComboBox,
@@ -370,6 +426,12 @@ public class ItemForm {
     return searchButton;
   }
 
+
+  /**
+   * Returns the delete button
+   *
+   * @return Button
+   */
   public Button getDeleteButton() {
     Button deleteButton = new Button("Delete");
     deleteButton.setPrefHeight(30);
@@ -396,6 +458,14 @@ public class ItemForm {
     return deleteButton;
   }
 
+
+  /**
+   * showAlert is used to display the success notice or an error
+   *
+   * @param alertType
+   * @param title
+   * @param message
+   */
   private void showAlert(Alert.AlertType alertType, String title, String message) {
     Alert alert = new Alert(alertType);
     alert.setTitle(title);
@@ -404,6 +474,18 @@ public class ItemForm {
     alert.showAndWait();
   }
 
+
+  /**
+   * sets the field values of the item form from the selected item
+   * @param titleField
+   * @param authorsField
+   * @param isbnField
+   * @param publisherComboBox
+   * @param numberOfCopiesField
+   * @param publicationDateField
+   * @param deweyNumberField
+   * @param typeComboBox
+   */
   public void setFieldValues(
     TextField titleField, TextField authorsField,
     TextField isbnField, ComboBox<String> publisherComboBox,
@@ -427,6 +509,11 @@ public class ItemForm {
     }
   }
 
+
+  /**
+   * Applies integer formatter to the provided text field
+   * @param field
+   */
   public void applyIntegerFormatToField(TextField field) {
     final Pattern NumberRegx = Pattern.compile("[-]?[\\d]*");
     field.setTextFormatter(new TextFormatter<>(f -> {
@@ -438,6 +525,12 @@ public class ItemForm {
     }));
   }
 
+
+  /**
+   * Converts the date to String
+   * @param date
+   * @return String
+   */
   private String dateToString(LocalDate date){
     if (date != null) {
       return dateFormatter.format(date);
@@ -446,6 +539,13 @@ public class ItemForm {
     }
   }
 
+
+  /**
+   * Converts the String to LocalDate
+   *
+   * @param string
+   * @return LocalDate
+   */
   private LocalDate stringToDate(String string){
     if (string != null && !string.isEmpty()) {
       return LocalDate.parse(string, dateFormatter);
