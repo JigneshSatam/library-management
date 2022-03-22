@@ -286,18 +286,21 @@ public class ItemForm {
           item.setNumber_Of_Copies(Integer.parseInt(numberOfCopiesField.getText()));
           item.setItem_Type(typeComboBox.getSelectionModel().selectedItemProperty().getValue());
           item.setPublication_Date(publicationDateField.getValue().toString());
-          if (selectedItem == null) {
-            itemController.createItem(item);
-            showAlert(
-                Alert.AlertType.CONFIRMATION,
-                "Item Create", "Item " + titleField.getText().trim() + " created successfully.");
-          } else {
+          if (
+            selectedItem != null &&
+            selectedItem.getItem_Description_ID() > 0
+          ) {
             item.setItem_ID(selectedItem.getItem_ID());
             item.setItem_Description_ID(selectedItem.getItem_Description_ID());
             itemController.updateItem(item);
             showAlert(
                 Alert.AlertType.CONFIRMATION,
                 "Item Update", "Item " + titleField.getText().trim() + " updated successfully.");
+          } else {
+            itemController.createItem(item);
+            showAlert(
+              Alert.AlertType.CONFIRMATION,
+              "Item Create", "Item " + titleField.getText().trim() + " created successfully.");
           }
           itemController.list(false, null, false);
         } catch (Exception e) {
